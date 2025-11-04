@@ -1,0 +1,72 @@
+<div class="flex flex-col h-screen max-w-4xl mx-auto p-2 md:p-4">
+    <header class="border-b border-gray-700 pb-2 mb-4">
+        <h1 class="text-2xl font-bold text-center text-indigo-400">
+            GastroAnalitičar
+            <span class="text-sm font-normal text-gray-400 block">AI Menu Assistant</span>
+        </h1>
+    </header>
+
+    <main #chatContainer class="flex-1 overflow-y-auto chat-container p-4 space-y-6 bg-gray-800/50 rounded-lg">
+        @for (message of messages(); track message.timestamp) {
+            <div [class]="'flex ' + (message.role === 'user' ? 'justify-end' : 'justify-start')">
+                <div [class]="'max-w-xl p-4 rounded-2xl ' + (message.role === 'user' ? 'bg-indigo-600 rounded-br-none' : 'bg-gray-700 rounded-bl-none')">
+                    <div [innerHTML]="parseMarkdown(message.content)" class="prose prose-invert prose-sm"></div>
+                    
+                    @if (message.options && message.options.length > 0) {
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            @for(option of message.options; track option) {
+                                <button 
+                                    (click)="handleOptionClick(option)"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-500 rounded-full hover:bg-indigo-600 transition-colors duration-200 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                                    [disabled]="isLoading()">
+                                    {{ option }}
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        @if (isLoading()) {
+            <div class="flex justify-start">
+                <div class="max-w-xl p-4 rounded-2xl bg-gray-700 rounded-bl-none">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
+                        <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse [animation-delay:0.2s]"></div>
+                        <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse [animation-delay:0.4s]"></div>
+                    </div>
+                </div>
+            </div>
+        }
+    </main>
+
+    <footer class="mt-4 pt-2">
+        <div class="relative flex items-center bg-gray-800 rounded-full border border-gray-700 focus-within:ring-2 focus-within:ring-indigo-500">
+            <textarea
+                #userInputElement
+                [value]="userInput()"
+                (input)="userInput.set($any($event.target).value)"
+                (keydown.enter)="handleSend(); $event.preventDefault()"
+                [disabled]="isInputDisabled()"
+                placeholder="Unesite tekst menija ili poruku..."
+                rows="1"
+                class="w-full bg-transparent p-4 pl-12 pr-24 text-white placeholder-gray-400 resize-none focus:outline-none disabled:cursor-not-allowed"></textarea>
+
+            <label for="file-upload" class="absolute left-3 p-2 rounded-full hover:bg-gray-700 cursor-pointer transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+            </label>
+            <input id="file-upload" type="file" class="hidden" (change)="handleImageUpload($event)" accept="image/*" [disabled]="isInputDisabled()">
+
+            <button
+                (click)="handleSend()"
+                [disabled]="!userInput().trim() || isInputDisabled()"
+                class="absolute right-3 p-2 rounded-full bg-indigo-600 text-white disabled:bg-gray-600 disabled:cursor-not-allowed hover:bg-indigo-700 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+            </button>
+        </div>
+    </footer>
+</div>

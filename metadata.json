@@ -1,0 +1,7 @@
+{
+  "name": "GastroAnalitičar",
+  "description": "AI-powered menu analysis and competitor comparison tool for restaurant owners. Upload your menu as text or a photo to receive expert insights from an AI F&B Manager and Head Chef.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
